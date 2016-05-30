@@ -1,0 +1,7 @@
+include ':app', ':volleyplus', 'dao-generator'
+project(':volleyplus').projectDir = new File('./volleyplus/library')
+include 'rest_api'
+include 'core'
+include 'crawler'
+include 'server'
+

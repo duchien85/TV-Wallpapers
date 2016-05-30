@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">TV Wallpapers</string>
+    <string name="popular_shows">Popular</string>
+    <string name="favorite_shows">Favorite</string>
+    <string name="all_shows">All</string>
+    <string name="no_photos">No photos right now\nCheck back later</string>
+    <string name="search">Search</string>
+    <string name="settings">Settings</string>
+</resources>
