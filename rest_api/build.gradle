@@ -19,4 +19,6 @@ dependencies {
     providedCompile 'javax.servlet:javax.servlet-api:3.1.0'
     compile "org.json:json:20090211"
     compile project (":server")
+    compile group: 'org.apache.solr', name: 'solr-solrj', version: '6.0.1'
+
 }

@@ -1,9 +1,18 @@
 package rs.pedjaapps.moviewallpapers;
 
+import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrDocumentList;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.GET;
@@ -19,6 +28,73 @@ import rs.pedjaapps.moviewallpapers.model.ShowPhoto;
 @Path("/shows")
 public class Shows
 {
+    private SolrClient mSolarClient;
+
+    public Shows()
+    {
+        String urlString = "http://localhost:8983/solr/tvwallpapers";
+        mSolarClient = new HttpSolrClient(urlString);
+    }
+
+    @GET
+    @Path("/search")
+    public Response searchShows(@QueryParam("q") String query, @QueryParam("with_overview") boolean withOverview)
+    {
+        SolrQuery solrQuery = new SolrQuery();
+        solrQuery.setQuery(query);
+        solrQuery.set("fl", "id");
+        solrQuery.set("df", "title");
+
+        List<Show> shows;
+
+        try
+        {
+            QueryResponse response = mSolarClient.query(solrQuery);
+            SolrDocumentList list = response.getResults();
+
+            StringBuilder csvIds = new StringBuilder();
+            for(int i = 0; i < list.size(); i++)
+            {
+                if(i != 0)
+                    csvIds.append(",");
+                csvIds.append(list.get(i).get("id"));
+            }
+            shows = DatabaseManager.getInstance().getShows(csvIds.toString(), withOverview);
+        }
+        catch (SolrServerException | IOException e)
+        {
+            shows = new ArrayList<>(0);
+        }
+
+        try
+        {
+            JSONObject data = new JSONObject();
+            JSONArray jShows = new JSONArray();
+            for (Show show : shows)
+            {
+                JSONObject jShow = new JSONObject();
+                jShow.put("id", show.id);
+                jShow.put("title", show.title);
+                jShow.put("imdb_id", show.imdb);
+                jShow.put("year", show.year);
+                if (withOverview) jShow.put("overview", show.overview);
+                if(show.showPhoto != null)
+                {
+                    JSONObject jShowPhoto = new JSONObject();
+                    jShowPhoto.put("filename", show.showPhoto.filename);
+                    jShow.put("poster", jShowPhoto);
+                }
+                jShows.put(jShow);
+            }
+            data.put("shows", jShows);
+            return Response.ok(data.toString(), MediaType.APPLICATION_JSON).build();
+        }
+        catch (JSONException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
     @GET
     @Path("/{show_id}")
     public Response getShow(@PathParam("show_id") int showId, @QueryParam("with_poster") boolean withPoster)
