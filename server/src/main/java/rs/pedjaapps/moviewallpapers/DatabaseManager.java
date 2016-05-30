@@ -469,6 +469,57 @@ public class DatabaseManager
         }
     }
 
+    public List<Show> getShows(String ids, boolean getOverview, boolean withPoster)
+    {
+        List<Show> shows = new ArrayList<>(10);
+        try
+        {
+            PreparedStatement selectStatement;
+            if (!withPoster)
+            {
+                selectStatement = conn.prepareStatement("SELECT id, title, imdb_id, year" + (getOverview ? ", overview" : "") + " FROM shows s WHERE id in ? AND s.title IS NOT NUll AND s.title != 'null' && s.title != '' ORDER BY ps.ord ASC");
+            }
+            else
+            {
+                selectStatement = conn.prepareStatement("SELECT sp.show_id, sp.filename, sp.type, s.id, s.title, s.imdb_id, s.year" + (getOverview ? ", s.overview" : "") + " FROM shows s WHERE id in ? AND s.title IS NOT NUll AND s.title != 'null' && s.title != '' GROUP BY s.id ORDER BY ps.ord ASC");
+            }
+            selectStatement.setString(1, ids);
+
+            ResultSet resultSet = selectStatement.executeQuery();
+
+            while (resultSet.next())
+            {
+                Show show = new Show();
+                show.id = resultSet.getInt("id");
+                show.title = resultSet.getString("title");
+                show.imdb = resultSet.getString("imdb_id");
+                show.year = resultSet.getInt("year");
+                if (getOverview) show.overview = resultSet.getString("overview");
+                int sid = !withPoster ? -1 : resultSet.getInt("show_id");
+                if(sid > 0)
+                {
+                    ShowPhoto showPhoto = new ShowPhoto();
+                    showPhoto.showId = sid;
+                    showPhoto.type = resultSet.getString("type");
+                    showPhoto.filename = resultSet.getString("filename");
+                    show.showPhoto = showPhoto;
+                }
+                shows.add(show);
+            }
+
+            return shows;
+        }
+        catch (SQLException e)
+        {
+            //fail silently
+            if (debug)
+                e.printStackTrace();
+            LOGGER.warning(e.getMessage());
+            return shows;
+        }
+    }
+
+
     public List<ShowPhoto> getPopularShowPhotos(boolean withShow)
     {
         List<ShowPhoto> photos = new ArrayList<>(100);

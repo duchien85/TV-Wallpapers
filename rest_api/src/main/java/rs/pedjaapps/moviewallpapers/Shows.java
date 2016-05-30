@@ -38,7 +38,7 @@ public class Shows
 
     @GET
     @Path("/search")
-    public Response searchShows(@QueryParam("q") String query, @QueryParam("with_overview") boolean withOverview)
+    public Response searchShows(@QueryParam("q") String query, @QueryParam("get_overview") boolean withOverview, @QueryParam("with_poster") boolean withPoster)
     {
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setQuery(query);
@@ -59,7 +59,7 @@ public class Shows
                     csvIds.append(",");
                 csvIds.append(list.get(i).get("id"));
             }
-            shows = DatabaseManager.getInstance().getShows(csvIds.toString(), withOverview);
+            shows = DatabaseManager.getInstance().getShows(csvIds.toString(), withOverview, withPoster);
         }
         catch (SolrServerException | IOException e)
         {
