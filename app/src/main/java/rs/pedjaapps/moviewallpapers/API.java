@@ -21,8 +21,8 @@ package rs.pedjaapps.moviewallpapers;
  */
 public class API
 {
-    //public static final String REQUEST_URL = "http://pedjaapps.net:9080/mwp/";
-    public static final String REQUEST_URL = "http://10.0.2.2:8080/";
+    public static final String REQUEST_URL = "http://pedjaapps.net:9080/mwp/";
+    //public static final String REQUEST_URL = "http://10.0.2.2:8080/";
     private API()
     {}
 }

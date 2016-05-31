@@ -77,24 +77,40 @@ public class Shows
         try
         {
             JSONObject data = new JSONObject();
-            JSONArray jShows = new JSONArray();
-            for (Show show : shows)
+            JSONArray jObjects = new JSONArray();
+            if (!getPhoto)
             {
-                JSONObject jShow = new JSONObject();
-                jShow.put("id", show.id);
-                jShow.put("title", show.title);
-                jShow.put("imdb_id", show.imdb);
-                jShow.put("year", show.year);
-                if (withOverview) jShow.put("overview", show.overview);
-                if(show.showPhoto != null)
+                for (Object o : shows)
                 {
-                    JSONObject jShowPhoto = new JSONObject();
-                    jShowPhoto.put("filename", show.showPhoto.filename);
-                    jShow.put("poster", jShowPhoto);
+                    Show show = (Show) o;
+                    JSONObject jShow = new JSONObject();
+                    jShow.put("id", show.id);
+                    jShow.put("title", show.title);
+                    jShow.put("imdb_id", show.imdb);
+                    jShow.put("year", show.year);
+                    if (withOverview) jShow.put("overview", show.overview);
+                    if(show.showPhoto != null)
+                    {
+                        JSONObject jShowPhoto = new JSONObject();
+                        jShowPhoto.put("filename", show.showPhoto.filename);
+                        jShow.put("poster", jShowPhoto);
+                    }
+                    jObjects.put(jShow);
                 }
-                jShows.put(jShow);
+                data.put("shows", jObjects);
             }
-            data.put("shows", jShows);
+            else
+            {
+                for(Object o : shows)
+                {
+                    ShowPhoto showPhoto = (ShowPhoto) o;
+                    JSONObject jShow = new JSONObject();
+                    jShow.put("show_id", showPhoto.showId);
+                    jShow.put("filename", showPhoto.filename);
+                    jObjects.put(jShow);
+                }
+                data.put("show_photos", jObjects);
+            }
             return Response.ok(data.toString(), MediaType.APPLICATION_JSON).build();
         }
         catch (JSONException e)

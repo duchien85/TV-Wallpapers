@@ -31,6 +31,8 @@ public class SearchFragment extends PhotoGridFragment
         Request request = new Request(Request.Method.GET);
         request.addUrlPart("shows").addUrlPart("search");
         request.addParam("q", query);
+        request.addParam("get_photo", String.valueOf(true));
+        request.addParam("with_show", String.valueOf(true));
         return request;
     }
 }

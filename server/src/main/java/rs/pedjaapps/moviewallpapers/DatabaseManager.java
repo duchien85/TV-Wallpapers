@@ -60,7 +60,7 @@ public class DatabaseManager
         //LOGGER.addHandler(new FileHandler());
         try
         {
-            conn = DriverManager.getConnection("jdbc:mysql://pedjaapps.net:3306/moviewallpapers?useLegacyDatetimeCode=false&serverTimezone=UTC&useSSL=false", "mwp", "vN@q55j5");
+            conn = DriverManager.getConnection("jdbc:mysql://pedjaapps.net:3306/moviewallpapers?useLegacyDatetimeCode=false&serverTimezone=UTC&useSSL=false&autoReconnect=true", "mwp", "vN@q55j5");
         }
         catch (Exception e)
         {
@@ -390,22 +390,19 @@ public class DatabaseManager
 
     public List<ShowPhoto> getShowPhotos(String showIds, boolean withShow)
     {
-        List<ShowPhoto> shows = new ArrayList<>(perPage + 1);
+        List<ShowPhoto> shows = new ArrayList<>(10);
         try
         {
-            int offset = (page - 1) * perPage;
             PreparedStatement selectStatement;
             if (!withShow)
             {
-                selectStatement = conn.prepareStatement("SELECT show_id, filename FROM show_photo WHERE type = ? ORDER BY modified DESC LIMIT ?, ?");
+                selectStatement = conn.prepareStatement("SELECT show_id, filename FROM show_photo WHERE type = ? AND show_id in (" + showIds + ") GROUP BY show_id ORDER BY modified DESC");
             }
             else
             {
-                selectStatement = conn.prepareStatement("SELECT s.id, s.title, s.year, sp.show_id, sp.filename FROM show_photo sp INNER JOIN shows s ON s.id = sp.show_id WHERE sp.type = ? AND title IS NOT NUll AND title != 'null' && title != '' ORDER BY sp.modified DESC LIMIT ?, ?");
+                selectStatement = conn.prepareStatement("SELECT s.id, s.title, s.year, sp.show_id, sp.filename FROM show_photo sp INNER JOIN shows s ON s.id = sp.show_id WHERE sp.type = ? AND show_id in (" + showIds + ") AND title IS NOT NUll AND title != 'null' && title != '' GROUP BY sp.show_id ORDER BY sp.modified DESC");
             }
             selectStatement.setString(1, "fanart");
-            selectStatement.setInt(2, offset);
-            selectStatement.setInt(3, perPage + 1);
 
             ResultSet resultSet = selectStatement.executeQuery();
 
