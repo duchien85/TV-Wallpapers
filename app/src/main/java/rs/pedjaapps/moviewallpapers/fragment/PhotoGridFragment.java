@@ -56,6 +56,7 @@ public abstract class PhotoGridFragment extends Fragment implements SwipeRefresh
     private int previousTotal = 0;
     private int firstVisibleItem, visibleItemCount, totalItemCount;
     private boolean wantToLoadMore;
+    public boolean reuseRequest = true;
 
     @Nullable
     @Override
@@ -137,6 +138,8 @@ public abstract class PhotoGridFragment extends Fragment implements SwipeRefresh
     @Override
     public void onRefresh()
     {
+        if(!reuseRequest)
+            pagedLoader.setRequest(getRequest());
         loading = false;
         previousTotal = 0;
         firstVisibleItem = 0;

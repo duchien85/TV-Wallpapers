@@ -6,3 +6,10 @@
 .DS_Store
 /build
 /captures
+/server/build
+/rest_api/build
+/dao-generator/build
+/crawler/build
+/core/build
+.idea
+app/fabric.properties

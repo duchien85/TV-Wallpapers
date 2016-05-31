@@ -5,7 +5,6 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -38,14 +37,16 @@ public class Shows
 
     @GET
     @Path("/search")
-    public Response searchShows(@QueryParam("q") String query, @QueryParam("get_overview") boolean withOverview, @QueryParam("with_poster") boolean withPoster)
+    public Response searchShows(@QueryParam("q") String query, @QueryParam("get_overview") boolean withOverview,
+                                @QueryParam("with_poster") boolean withPoster, @QueryParam("get_photo") boolean getPhoto,
+                                @QueryParam("with_show") boolean withShow)
     {
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setQuery(query);
         solrQuery.set("fl", "id");
         solrQuery.set("df", "title");
 
-        List<Show> shows;
+        List shows;
 
         try
         {
@@ -59,7 +60,14 @@ public class Shows
                     csvIds.append(",");
                 csvIds.append(list.get(i).get("id"));
             }
-            shows = DatabaseManager.getInstance().getShows(csvIds.toString(), withOverview, withPoster);
+            if (getPhoto)
+            {
+                shows = DatabaseManager.getInstance().getShowPhotos(csvIds.toString(), withShow);
+            }
+            else
+            {
+                shows = DatabaseManager.getInstance().getShows(csvIds.toString(), withOverview, withPoster);
+            }
         }
         catch (SolrServerException | IOException e)
         {

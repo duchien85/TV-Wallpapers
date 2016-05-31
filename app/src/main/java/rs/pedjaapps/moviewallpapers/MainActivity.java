@@ -1,5 +1,6 @@
 package rs.pedjaapps.moviewallpapers;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -19,6 +20,9 @@ import rs.pedjaapps.moviewallpapers.fragment.PopularFragment;
 
 public class MainActivity extends AppCompatActivity
 {
+    private static final int MENU_ITEM_ID_SEARCH = 0;
+    private static final int MENU_ITEM_ID_SETTINGS = 1;
+
     private Toolbar toolbar;
     private TabLayout tabLayout;
     private ViewPager viewPager;
@@ -87,15 +91,29 @@ public class MainActivity extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu)
     {
         //search
-        MenuItem search = menu.add(getString(R.string.search));
+        MenuItem search = menu.add(0, MENU_ITEM_ID_SEARCH, 0, getString(R.string.search));
         search.setIcon(R.drawable.ic_action_action_search);
         search.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
         //settings
-        MenuItem settings = menu.add(getString(R.string.settings));
+        MenuItem settings = menu.add(0, MENU_ITEM_ID_SETTINGS, 0, getString(R.string.settings));
         settings.setIcon(R.drawable.ic_action_action_settings);
         settings.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
         return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        switch (item.getItemId())
+        {
+            case MENU_ITEM_ID_SEARCH:
+                startActivity(new Intent(this, SearchActivity.class));
+                break;
+            case MENU_ITEM_ID_SETTINGS:
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

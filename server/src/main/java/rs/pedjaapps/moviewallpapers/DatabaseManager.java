@@ -386,6 +386,60 @@ public class DatabaseManager
         }
     }
 
+
+
+    public List<ShowPhoto> getShowPhotos(String showIds, boolean withShow)
+    {
+        List<ShowPhoto> shows = new ArrayList<>(perPage + 1);
+        try
+        {
+            int offset = (page - 1) * perPage;
+            PreparedStatement selectStatement;
+            if (!withShow)
+            {
+                selectStatement = conn.prepareStatement("SELECT show_id, filename FROM show_photo WHERE type = ? ORDER BY modified DESC LIMIT ?, ?");
+            }
+            else
+            {
+                selectStatement = conn.prepareStatement("SELECT s.id, s.title, s.year, sp.show_id, sp.filename FROM show_photo sp INNER JOIN shows s ON s.id = sp.show_id WHERE sp.type = ? AND title IS NOT NUll AND title != 'null' && title != '' ORDER BY sp.modified DESC LIMIT ?, ?");
+            }
+            selectStatement.setString(1, "fanart");
+            selectStatement.setInt(2, offset);
+            selectStatement.setInt(3, perPage + 1);
+
+            ResultSet resultSet = selectStatement.executeQuery();
+
+            while (resultSet.next())
+            {
+                ShowPhoto showPhoto = new ShowPhoto();
+                showPhoto.showId = resultSet.getInt("show_id");
+                showPhoto.filename = resultSet.getString("filename");
+
+                int sid = !withShow ? -1 : resultSet.getInt("id");
+                if(sid > 0)
+                {
+                    Show show = new Show();
+                    show.id = sid;
+                    show.title = resultSet.getString("title");
+                    show.year = resultSet.getInt("year");
+                    showPhoto.show = show;
+                }
+
+                shows.add(showPhoto);
+            }
+
+            return shows;
+        }
+        catch (SQLException e)
+        {
+            //fail silently
+            if (debug)
+                e.printStackTrace();
+            LOGGER.warning(e.getMessage());
+            return shows;
+        }
+    }
+
     public List<ShowPhoto> getShowPhotos(int showId, int page, int perPage)
     {
         List<ShowPhoto> shows = new ArrayList<>(perPage + 1);
@@ -477,13 +531,12 @@ public class DatabaseManager
             PreparedStatement selectStatement;
             if (!withPoster)
             {
-                selectStatement = conn.prepareStatement("SELECT id, title, imdb_id, year" + (getOverview ? ", overview" : "") + " FROM shows s WHERE id in ? AND s.title IS NOT NUll AND s.title != 'null' && s.title != '' ORDER BY ps.ord ASC");
+                selectStatement = conn.prepareStatement("SELECT id, title, imdb_id, year" + (getOverview ? ", overview" : "") + " FROM shows s WHERE id in (" + ids + ") AND s.title IS NOT NUll AND s.title != 'null' && s.title != '' ORDER BY FIELD(s.id, " + ids + ") ASC");
             }
             else
             {
-                selectStatement = conn.prepareStatement("SELECT sp.show_id, sp.filename, sp.type, s.id, s.title, s.imdb_id, s.year" + (getOverview ? ", s.overview" : "") + " FROM shows s WHERE id in ? AND s.title IS NOT NUll AND s.title != 'null' && s.title != '' GROUP BY s.id ORDER BY ps.ord ASC");
+                selectStatement = conn.prepareStatement("SELECT sp.show_id, sp.filename, sp.type, s.id, s.title, s.imdb_id, s.year" + (getOverview ? ", s.overview" : "") + " FROM shows s WHERE id in (" + ids + ") AND s.title IS NOT NUll AND s.title != 'null' && s.title != '' GROUP BY s.id ORDER BY FIELD(s.id, " + ids + ") ASC");
             }
-            selectStatement.setString(1, ids);
 
             ResultSet resultSet = selectStatement.executeQuery();
 
