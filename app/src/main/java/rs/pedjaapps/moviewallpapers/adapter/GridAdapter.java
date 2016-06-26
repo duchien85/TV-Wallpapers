@@ -11,8 +11,8 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.af.androidutility.lib.DisplayManager;
 import com.af.androidutility.lib.RVArrayAdapter;
+import com.af.jutils.DisplayUtils;
 
 import java.util.List;
 
@@ -51,7 +51,7 @@ public class GridAdapter extends RVArrayAdapter<TypeListItem<ShowPhoto>>
     {
         super(context, items);
         this.loadMorePhotos = loadMorePhotos;
-        screenWidth = new DisplayManager(context).screenWidth;
+        screenWidth = new DisplayUtils(context).screenWidth;
         columnCount = context.getResources().getInteger(R.integer.grid_column_count);
     }
 

@@ -15,6 +15,7 @@ import java.util.logging.Logger;
 
 import rs.pedjaapps.moviewallpapers.model.Show;
 import rs.pedjaapps.moviewallpapers.model.ShowPhoto;
+import rs.pedjaapps.moviewallpapers.model.TextUtils;
 
 /**
  * Created by pedja on 12.5.16. 16.04.
@@ -386,21 +387,21 @@ public class DatabaseManager
         }
     }
 
-
-
     public List<ShowPhoto> getShowPhotos(String showIds, boolean withShow)
     {
         List<ShowPhoto> shows = new ArrayList<>(10);
+        if(TextUtils.isEmpty(showIds))
+            return shows;
         try
         {
             PreparedStatement selectStatement;
             if (!withShow)
             {
-                selectStatement = conn.prepareStatement("SELECT show_id, filename FROM show_photo WHERE type = ? AND show_id in (" + showIds + ") GROUP BY show_id ORDER BY modified DESC");
+                selectStatement = conn.prepareStatement("SELECT show_id, filename FROM show_photo WHERE type = ? AND show_id in (" + showIds + ") GROUP BY show_id ORDER BY FIELD(s.id, " + showIds + ") ASC, filename DESC");
             }
             else
             {
-                selectStatement = conn.prepareStatement("SELECT s.id, s.title, s.year, sp.show_id, sp.filename FROM show_photo sp INNER JOIN shows s ON s.id = sp.show_id WHERE sp.type = ? AND show_id in (" + showIds + ") AND title IS NOT NUll AND title != 'null' && title != '' GROUP BY sp.show_id ORDER BY sp.modified DESC");
+                selectStatement = conn.prepareStatement("SELECT s.id, s.title, s.year, sp.show_id, sp.filename FROM show_photo sp INNER JOIN shows s ON s.id = sp.show_id WHERE sp.type = ? AND show_id in (" + showIds + ") AND title IS NOT NUll AND title != 'null' && title != '' GROUP BY sp.show_id ORDER BY FIELD(s.id, " + showIds + ") ASC, sp.filename DESC");
             }
             selectStatement.setString(1, "fanart");
 
@@ -523,6 +524,8 @@ public class DatabaseManager
     public List<Show> getShows(String ids, boolean getOverview, boolean withPoster)
     {
         List<Show> shows = new ArrayList<>(10);
+        if(TextUtils.isEmpty(ids))
+            return shows;
         try
         {
             PreparedStatement selectStatement;

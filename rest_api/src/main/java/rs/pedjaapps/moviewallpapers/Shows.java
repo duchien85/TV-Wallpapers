@@ -31,7 +31,7 @@ public class Shows
 
     public Shows()
     {
-        String urlString = "http://localhost:8983/solr/tvwallpapers";
+        String urlString = "http://pedjaapps.net:8983/solr/tvwallpapers";
         mSolarClient = new HttpSolrClient(urlString);
     }
 
@@ -104,10 +104,17 @@ public class Shows
                 for(Object o : shows)
                 {
                     ShowPhoto showPhoto = (ShowPhoto) o;
-                    JSONObject jShow = new JSONObject();
-                    jShow.put("show_id", showPhoto.showId);
-                    jShow.put("filename", showPhoto.filename);
-                    jObjects.put(jShow);
+                    JSONObject jShowPhoto = new JSONObject();
+                    jShowPhoto.put("show_id", showPhoto.showId);
+                    jShowPhoto.put("filename", showPhoto.filename);
+                    if(showPhoto.show != null)
+                    {
+                        JSONObject jShow = new JSONObject();
+                        jShow.put("title", showPhoto.show.title);
+                        jShow.put("year", showPhoto.show.year);
+                        jShowPhoto.put("show", jShow);
+                    }
+                    jObjects.put(jShowPhoto);
                 }
                 data.put("show_photos", jObjects);
             }

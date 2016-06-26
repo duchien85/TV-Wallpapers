@@ -8,18 +8,18 @@ import com.android.volley.cache.DiskLruBasedCache;
 import com.android.volley.cache.plus.SimpleImageLoader;
 import com.androidforever.dataloader.MemCache;
 import com.crashlytics.android.Crashlytics;
+import com.tehnicomsolutions.http.AndroidInternet;
+import com.tehnicomsolutions.http.AndroidNetwork;
+import com.tehnicomsolutions.http.AndroidRequestManager;
+import com.tehnicomsolutions.http.AndroidTextManager;
+import com.tehnicomsolutions.http.AndroidUI;
 import com.tehnicomsolutions.http.Http;
 import com.tehnicomsolutions.http.Internet;
-import com.tehnicomsolutions.http.InternetImpl;
 import com.tehnicomsolutions.http.Network;
-import com.tehnicomsolutions.http.NetworkImpl;
 import com.tehnicomsolutions.http.Request;
 import com.tehnicomsolutions.http.RequestManager;
-import com.tehnicomsolutions.http.RequestManagerImpl;
 import com.tehnicomsolutions.http.TextManager;
-import com.tehnicomsolutions.http.TextManagerImpl;
 import com.tehnicomsolutions.http.UI;
-import com.tehnicomsolutions.http.UIImpl;
 
 import io.fabric.sdk.android.Fabric;
 import rs.pedjaapps.moviewallpapers.network.MRequestHandler;
@@ -63,15 +63,15 @@ public class App extends Application
         }
         app = this;
 
-        Network network = new NetworkImpl(this);
-        Internet internet = new InternetImpl(this);
-        UI ui = new UIImpl(this);
-        TextManager textManager = new TextManagerImpl(this);
+        Network network = new AndroidNetwork(this);
+        Internet internet = new AndroidInternet(this);
+        UI ui = new AndroidUI(this);
+        TextManager textManager = new AndroidTextManager(this);
 
         Http.initialize(network, internet, ui, textManager);
 
         Request.setDefaultRequestUrl(API.REQUEST_URL);
-        RequestManager.initialize(new RequestManagerImpl());
+        RequestManager.initialize(new AndroidRequestManager());
         RequestManager.getInstance().setGlobalRequestHandler(new MRequestHandler());
         Http.LOGGING = SettingsManager.DEBUG();
 
