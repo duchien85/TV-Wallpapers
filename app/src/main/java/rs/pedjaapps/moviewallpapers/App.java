@@ -2,6 +2,7 @@ package rs.pedjaapps.moviewallpapers;
 
 import android.app.Activity;
 import android.app.Application;
+import android.os.Environment;
 
 import com.android.volley.VolleyLog;
 import com.android.volley.cache.DiskLruBasedCache;
@@ -20,6 +21,8 @@ import com.tehnicomsolutions.http.Request;
 import com.tehnicomsolutions.http.RequestManager;
 import com.tehnicomsolutions.http.TextManager;
 import com.tehnicomsolutions.http.UI;
+
+import java.io.File;
 
 import io.fabric.sdk.android.Fabric;
 import rs.pedjaapps.moviewallpapers.network.MRequestHandler;
@@ -43,6 +46,8 @@ public class App extends Application
     private SimpleImageLoader mGlobalImageLoader;
     private DiskLruBasedCache.ImageCacheParams cacheParams;
     private Activity mCurrentActivity = null;
+
+    public File DOWNLOAD_DIR;
 
     public static App get()
     {
@@ -76,6 +81,20 @@ public class App extends Application
         Http.LOGGING = SettingsManager.DEBUG();
 
         initImageLoader();
+
+        initDownloadDir();
+    }
+
+    private void initDownloadDir()
+    {
+        File pictures = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+        DOWNLOAD_DIR = new File(pictures, "tvwp");
+        if(!DOWNLOAD_DIR.exists())
+        {
+            DOWNLOAD_DIR.mkdir();
+        }
+        if(!DOWNLOAD_DIR.exists())
+            throw new IllegalStateException("Failed to create download dir on sdcard");
     }
 
     /**Init image loader cache*/

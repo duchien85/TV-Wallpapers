@@ -1,6 +1,13 @@
 package rs.pedjaapps.moviewallpapers.fragment;
 
+import com.androidforever.dataloader.DataProvider;
 import com.tehnicomsolutions.http.Request;
+
+import java.util.List;
+
+import rs.pedjaapps.moviewallpapers.model.Page;
+import rs.pedjaapps.moviewallpapers.model.ShowPhoto;
+import rs.pedjaapps.moviewallpapers.network.NetworkDataProvider;
 
 /**
  * Copyright (c) 2016 "Predrag Čokulov,"
@@ -24,11 +31,23 @@ import com.tehnicomsolutions.http.Request;
 public class PopularFragment extends PhotoGridFragment
 {
     @Override
+    protected List<DataProvider<Page<ShowPhoto>>> getAdditionalProviders()
+    {
+        return null;
+    }
+
+    @Override
     protected Request getRequest()
     {
         Request request = new Request(Request.Method.GET);
         request.addUrlPart("photos").addUrlPart("popular");
         request.addParam("with_show", String.valueOf(true));
         return request;
+    }
+
+    @Override
+    protected int getRequestCode()
+    {
+        return NetworkDataProvider.REQUEST_CODE_SHOWS_PHOTOS;
     }
 }

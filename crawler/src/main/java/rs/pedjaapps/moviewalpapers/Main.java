@@ -199,7 +199,7 @@ public class Main
                             DatabaseManager.getInstance().insertInvalidId(id);
                         }
                     }
-                    if (parser.getParseObject(int.class) > 0)
+                    if (parser.getParseObject() != null)
                     {
                         //success
                         //download photos

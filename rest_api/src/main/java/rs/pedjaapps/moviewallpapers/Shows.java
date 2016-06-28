@@ -31,7 +31,7 @@ public class Shows
 
     public Shows()
     {
-        String urlString = "http://pedjaapps.net:8983/solr/tvwallpapers";
+        String urlString = "http://localhost:8983/solr/tvwallpapers";
         mSolarClient = new HttpSolrClient(urlString);
     }
 
@@ -128,9 +128,14 @@ public class Shows
 
     @GET
     @Path("/{show_id}")
-    public Response getShow(@PathParam("show_id") int showId, @QueryParam("with_poster") boolean withPoster)
+    public Response getShow(@PathParam("show_id") int showId, @QueryParam("with_photo") boolean withPoster, @QueryParam("with_photos") boolean withPhotos)
     {
         Show show = DatabaseManager.getInstance().getShow(showId, withPoster);
+        List<ShowPhoto> photos = null;
+        if(withPhotos)
+        {
+            photos = DatabaseManager.getInstance().getShowPhotos(showId);
+        }
 
         try
         {
@@ -144,9 +149,18 @@ public class Shows
                 jShow.put("overview", show.overview);
                 if(show.showPhoto != null)
                 {
-                    JSONObject jShowPhoto = new JSONObject();
-                    jShowPhoto.put("filename", show.showPhoto.filename);
-                    jShow.put("poster", jShowPhoto);
+                    jShow.put("filename", show.showPhoto.filename);
+                }
+                if(photos != null)
+                {
+                    JSONArray jShowPhotos = new JSONArray();
+                    for(ShowPhoto photo : photos)
+                    {
+                        JSONObject jShowPhoto = new JSONObject();
+                        jShowPhoto.put("filename", photo.filename);
+                        jShowPhotos.put(jShowPhoto);
+                    }
+                    jShow.put("photos", jShowPhotos);
                 }
                 return Response.ok(jShow.toString(), MediaType.APPLICATION_JSON).build();
             }
@@ -201,7 +215,7 @@ public class Shows
 
     @GET
     @Path("/list")
-    public Response getShows(@QueryParam("page") int page, @QueryParam("per_page") int perPage, @QueryParam("get_overview") boolean getOverview, @QueryParam("with_poster") boolean withPoster)
+    public Response getShows(@QueryParam("page") int page, @QueryParam("per_page") int perPage, @QueryParam("get_overview") boolean getOverview, @QueryParam("with_photo") boolean withPoster)
     {
         if (perPage <= 0)
             perPage = Constants.DEFAULT_PER_PAGE;
@@ -228,9 +242,7 @@ public class Shows
                 if (getOverview) jShow.put("overview", show.overview);
                 if(show.showPhoto != null)
                 {
-                    JSONObject jShowPhoto = new JSONObject();
-                    jShowPhoto.put("filename", show.showPhoto.filename);
-                    jShow.put("poster", jShowPhoto);
+                    jShow.put("filename", show.showPhoto.filename);
                 }
                 jShows.put(jShow);
             }
@@ -263,9 +275,7 @@ public class Shows
                 if (getOverview) jShow.put("overview", show.overview);
                 if(show.showPhoto != null)
                 {
-                    JSONObject jShowPhoto = new JSONObject();
-                    jShowPhoto.put("filename", show.showPhoto.filename);
-                    jShow.put("poster", jShowPhoto);
+                    jShow.put("filename", show.showPhoto.filename);
                 }
                 jShows.put(jShow);
             }

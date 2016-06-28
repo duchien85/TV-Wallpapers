@@ -15,6 +15,8 @@ import rs.pedjaapps.moviewallpapers.model.JSONParser;
 public class NetworkDataProvider<T> implements DataProvider<T>
 {
     public static final int REQUEST_CODE_SHOWS_PHOTOS = 1;
+    public static final int REQUEST_CODE_SHOWS_AS_PHOTOS = 2;
+    public static final int REQUEST_CODE_SHOW = 3;
 
     private Request request;
     private T resultData;
@@ -62,7 +64,12 @@ public class NetworkDataProvider<T> implements DataProvider<T>
                 case REQUEST_CODE_SHOWS_PHOTOS:
                     jsonParser.parseGetShowPhotosResponse();
                     break;
-
+                case REQUEST_CODE_SHOWS_AS_PHOTOS:
+                    jsonParser.parseGetShowsAsPhotosResponse();
+                    break;
+                case REQUEST_CODE_SHOW:
+                    jsonParser.parseGetShowResponse();
+                    break;
             }
             return handleResponse(jsonParser);
         }

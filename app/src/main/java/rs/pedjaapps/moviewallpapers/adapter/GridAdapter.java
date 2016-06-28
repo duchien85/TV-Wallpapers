@@ -9,10 +9,12 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.af.androidutility.lib.RVArrayAdapter;
+import com.af.jutils.Android;
 import com.af.jutils.DisplayUtils;
+import com.af.jutils.RVArrayAdapter;
 
 import java.util.List;
 
@@ -20,6 +22,7 @@ import rs.pedjaapps.moviewallpapers.App;
 import rs.pedjaapps.moviewallpapers.R;
 import rs.pedjaapps.moviewallpapers.model.ShowPhoto;
 import rs.pedjaapps.moviewallpapers.model.TypeListItem;
+import rs.pedjaapps.moviewallpapers.utility.DownloadUtils;
 import rs.pedjaapps.moviewallpapers.utility.ImageUtility;
 
 /**
@@ -46,13 +49,19 @@ public class GridAdapter extends RVArrayAdapter<TypeListItem<ShowPhoto>>
     private int screenWidth, columnCount;
     private LoadMorePhotos loadMorePhotos;
     private int lastPosition = -1;
+    private String transitionName;
+    private boolean displayShow, showDownload;
 
-    public GridAdapter(@NonNull Context context, @NonNull List<TypeListItem<ShowPhoto>> items, LoadMorePhotos loadMorePhotos)
+    public GridAdapter(@NonNull Context context, @NonNull List<TypeListItem<ShowPhoto>> items,
+                       LoadMorePhotos loadMorePhotos, String transitionName, boolean displayShow, boolean showDownload)
     {
         super(context, items);
         this.loadMorePhotos = loadMorePhotos;
         screenWidth = new DisplayUtils(context).screenWidth;
         columnCount = context.getResources().getInteger(R.integer.grid_column_count);
+        this.transitionName = transitionName;
+        this.displayShow = displayShow;
+        this.showDownload = showDownload;
     }
 
     @Override
@@ -62,6 +71,10 @@ public class GridAdapter extends RVArrayAdapter<TypeListItem<ShowPhoto>>
         {
             return new ViewHolder(LayoutInflater.from(context).inflate(R.layout.photo_grid_item, parent, false));
         }
+        else if (viewType == ShowPhoto.VIEW_TYPE_OVERVIEW)
+        {
+            return new ViewHolder(LayoutInflater.from(context).inflate(R.layout.photo_grid_overview, parent, false));
+        }
         else if (viewType == TypeListItem.VIEW_TYPE_LOADER)
         {
             return new ViewHolder(LayoutInflater.from(context).inflate(R.layout.loader_grid_item, parent, false));
@@ -70,38 +83,96 @@ public class GridAdapter extends RVArrayAdapter<TypeListItem<ShowPhoto>>
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position)
+    public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, final int position)
     {
         ViewHolder holder = (ViewHolder) viewHolder;
-        ShowPhoto photo = getItem(position).getItem();
-
-        RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) viewHolder.itemView.getLayoutParams();
-        params.width = screenWidth / columnCount;
-        //noinspection SuspiciousNameCombination
-        params.height = params.width;
-        holder.itemView.setLayoutParams(params);
+        final ShowPhoto photo = getItem(position).getItem();
 
         int viewType = getItemViewType(position);
         if (viewType == ShowPhoto.VIEW_TYPE_PHOTO)
         {
+            if (Android.hasLollipop())
+            {
+                holder.ivImage.setTransitionName(transitionName);
+            }
+
+            holder.llShow.setVisibility(displayShow ? View.VISIBLE : View.GONE);
+            holder.ivDownload.setVisibility(showDownload && !photo.downloading ? View.VISIBLE : View.GONE);
+
             if (photo.show != null)
             {
                 holder.tvTitle.setText(photo.show.title);
-                holder.tvYear.setText(String.valueOf(photo.show.year));
+                if(photo.show.year <= 0)
+                {
+                    holder.tvYear.setVisibility(View.GONE);
+                }
+                else
+                {
+                    holder.tvYear.setText(String.valueOf(photo.show.year));
+                    holder.tvYear.setVisibility(View.VISIBLE);
+                }
             }
             else
             {
                 holder.tvTitle.setText(null);
                 holder.tvYear.setText(null);
             }
-            App.get().getGlobalImageLoader().get(ImageUtility.generateImageUrl(photo), holder.ivImage);
+            if(photo.fullPath)
+            {
+                App.get().getGlobalImageLoader().get(photo.filename, holder.ivImage);
+            }
+            else
+            {
+                App.get().getGlobalImageLoader().get(ImageUtility.generateImageUrlThumb(photo), holder.ivImage);
+            }
             setAnimation(holder.itemView, position);
+
+            holder.itemView.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View view)
+                {
+                    if (onItemClickListener != null)
+                        onItemClickListener.onItemClick(view.findViewById(R.id.ivImage), photo, position);
+                }
+            });
+
+            holder.ivDownload.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View view)
+                {
+                    if(!DownloadUtils.isPhotoDownloaded(photo))
+                    {
+                        DownloadUtils.download(photo);
+                        photo.downloading = true;
+                        notifyDataSetChanged();
+                    }
+                }
+            });
+
+            setDimensions(holder);
+        }
+        else if (viewType == ShowPhoto.VIEW_TYPE_OVERVIEW)
+        {
+            holder.tvOverview.setText(photo.show.overview);
+            holder.tvYear.setText(String.valueOf(photo.show.year));
         }
         else if (viewType == TypeListItem.VIEW_TYPE_LOADER)
         {
             if (loadMorePhotos != null)
                 loadMorePhotos.loadMore();
+            setDimensions(holder);
         }
+    }
+
+    private void setDimensions(ViewHolder holder)
+    {
+        RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) holder.itemView.getLayoutParams();
+        params.width = screenWidth / columnCount;
+        //noinspection SuspiciousNameCombination
+        params.height = params.width;
+        holder.itemView.setLayoutParams(params);
     }
 
     private void setAnimation(View viewToAnimate, int position)
@@ -119,7 +190,7 @@ public class GridAdapter extends RVArrayAdapter<TypeListItem<ShowPhoto>>
     @Override
     public void onViewDetachedFromWindow(final RecyclerView.ViewHolder holder)
     {
-        ((ViewHolder)holder).clearAnimation();
+        ((ViewHolder) holder).clearAnimation();
     }
 
     @Override
@@ -135,15 +206,19 @@ public class GridAdapter extends RVArrayAdapter<TypeListItem<ShowPhoto>>
 
     private class ViewHolder extends RecyclerView.ViewHolder
     {
-        private ImageView ivImage;
-        private TextView tvTitle, tvYear;
+        private ImageView ivImage, ivDownload;
+        private TextView tvTitle, tvYear, tvOverview;
+        private LinearLayout llShow;
 
         public ViewHolder(View itemView)
         {
             super(itemView);
             ivImage = (ImageView) itemView.findViewById(R.id.ivImage);
+            ivDownload = (ImageView) itemView.findViewById(R.id.ivDownload);
             tvTitle = (TextView) itemView.findViewById(R.id.tvTitle);
             tvYear = (TextView) itemView.findViewById(R.id.tvYear);
+            tvOverview = (TextView) itemView.findViewById(R.id.tvOverview);
+            llShow = (LinearLayout) itemView.findViewById(R.id.llShow);
         }
 
         public void clearAnimation()

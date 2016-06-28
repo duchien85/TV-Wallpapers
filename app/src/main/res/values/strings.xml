@@ -6,4 +6,10 @@
     <string name="no_photos">No photos right now\nCheck back later</string>
     <string name="search">Search</string>
     <string name="settings">Settings</string>
+    <string name="transition_image_1">transition:image:1</string>
+    <string name="transition_image_2">transition:image:2</string>
+    <string name="overview">Overview</string>
+    <string name="year">Year</string>
+    <string name="downloaded">Downloaded</string>
+    <string name="download_failed">Failed to download photo.</string>
 </resources>

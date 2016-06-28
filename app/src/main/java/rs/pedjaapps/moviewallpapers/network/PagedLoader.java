@@ -1,7 +1,7 @@
 package rs.pedjaapps.moviewallpapers.network;
 
+import com.androidforever.dataloader.AndroidDataLoader;
 import com.androidforever.dataloader.DataLoader;
-import com.androidforever.dataloader.DataLoaderImpl;
 import com.androidforever.dataloader.DataProvider;
 import com.androidforever.dataloader.MemCache;
 import com.androidforever.dataloader.MemoryCacheDataProvider;
@@ -75,7 +75,7 @@ public class PagedLoader<T extends TypeListItem.IListItem>
         databaseDataProvider = new DatabaseDataProvider<>(requestCode, query);
         if(request != null && memcache)memoryCacheDataProvider = new MemoryCacheDataProvider<>(request.getRequestUrl());
 
-        dataLoader = new DataLoaderImpl<>();
+        dataLoader = new AndroidDataLoader<>();
         dataLoader.setListener(new SimpleLoadListener<Page<T>>()
         {
             @Override

@@ -300,4 +300,74 @@ public class JSONParser extends ResponseParser
         }
 
     }
+
+    public void parseGetShowResponse()
+    {
+        if (jsonObject == null)
+            return;
+        Show show = new Show();
+        show.title = jsonObject.optString("title");
+        show.year = jsonObject.optInt("year");
+        show.imdb = jsonObject.optString("imdb_id");
+        show.id = jsonObject.optInt("id");
+        show.overview = jsonObject.optString("overview");
+
+        ShowPhoto showPhoto = new ShowPhoto(ShowPhoto.VIEW_TYPE_OVERVIEW);
+        showPhoto.filename = jsonObject.optString("filename");
+        showPhoto.showId = show.id;
+        showPhoto.show = show;
+        show.showPhoto = showPhoto;
+
+        JSONArray jPhotos = jsonObject.optJSONArray("photos");
+        if (jPhotos != null)
+        {
+            List<TypeListItem<ShowPhoto>> photos = new ArrayList<>();
+            photos.add(new TypeListItem<>(showPhoto));
+            for (int i = 0; i < jPhotos.length(); i++)
+            {
+                JSONObject jPhoto = jPhotos.optJSONObject(i);
+                showPhoto = new ShowPhoto();
+                showPhoto.filename = jPhoto.optString("filename");
+                showPhoto.showId = show.id;
+                showPhoto.show = show;
+
+                photos.add(new TypeListItem<>(showPhoto));
+            }
+            show.photos = photos;
+        }
+
+        parseObject = show;
+    }
+
+    public void parseGetShowsAsPhotosResponse()
+    {
+        if (jsonObject == null)
+            return;
+        JSONArray jPhotos = jsonObject.optJSONArray("shows");
+        if (jPhotos != null)
+        {
+            Page<ShowPhoto> page = new Page<>();
+            page.items = new ArrayList<>(jPhotos.length());
+            page.next = jsonObject.optBoolean("has_next");
+            page.page = jsonObject.optInt("page", 1);
+
+            for (int i = 0; i < jPhotos.length(); i++)
+            {
+                JSONObject jShow = jPhotos.optJSONObject(i);
+                ShowPhoto showPhoto = new ShowPhoto();
+                showPhoto.filename = jShow.optString("filename");
+                showPhoto.showId = jShow.optInt("id");
+
+                Show show = new Show();
+                show.title = jShow.optString("title");
+                show.year = jShow.optInt("year");
+                show.id = showPhoto.showId;
+                showPhoto.show = show;
+
+                page.items.add(new TypeListItem<>(showPhoto));
+            }
+            parseObject = page;
+        }
+
+    }
 }

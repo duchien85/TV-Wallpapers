@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import rs.pedjaapps.moviewallpapers.fragment.AllFragment;
+import rs.pedjaapps.moviewallpapers.fragment.DownloadedFragment;
 import rs.pedjaapps.moviewallpapers.fragment.PopularFragment;
 
 public class MainActivity extends AppCompatActivity
@@ -49,6 +50,8 @@ public class MainActivity extends AppCompatActivity
         adapter.addFragment(new PopularFragment(), getString(R.string.popular_shows));
         //adapter.addFragment(new PhotoGridFragment(), getString(R.string.favorite_shows));
         adapter.addFragment(new AllFragment(), getString(R.string.all_shows));
+        viewPager.setAdapter(adapter);
+        adapter.addFragment(new DownloadedFragment(), getString(R.string.downloaded));
         viewPager.setAdapter(adapter);
     }
 
@@ -96,9 +99,9 @@ public class MainActivity extends AppCompatActivity
         search.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
         //settings
-        MenuItem settings = menu.add(0, MENU_ITEM_ID_SETTINGS, 0, getString(R.string.settings));
+        /*MenuItem settings = menu.add(0, MENU_ITEM_ID_SETTINGS, 0, getString(R.string.settings));
         settings.setIcon(R.drawable.ic_action_action_settings);
-        settings.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        settings.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);*/
 
         return super.onCreateOptionsMenu(menu);
     }

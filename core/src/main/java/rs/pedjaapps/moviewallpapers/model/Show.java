@@ -1,5 +1,7 @@
 package rs.pedjaapps.moviewallpapers.model;
 
+import java.util.List;
+
 /**
  * Copyright (c) 2016 "Predrag Čokulov,"
  * pedjaapps [https://pedjaapps.net]
@@ -25,4 +27,5 @@ public class Show
     public String title, imdb, overview;
     public int year;
     public ShowPhoto showPhoto;
+    public List<TypeListItem<ShowPhoto>> photos;
 }

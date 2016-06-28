@@ -13,6 +13,7 @@ repositories {
     maven { url 'http://maven.android-forever.com' }
     maven { url 'https://maven.fabric.io/public' }
     flatDir { dirs 'aars' }
+    maven { url "https://jitpack.io" }
 }
 
 apply plugin: 'com.android.application'
@@ -25,14 +26,26 @@ android {
     defaultConfig {
         applicationId "rs.pedjaapps.moviewallpapers"
         minSdkVersion 16
-        targetSdkVersion 24
+        targetSdkVersion 22
         versionCode 1
         versionName "1.0"
     }
+
+    signingConfigs {
+        release {
+            storeFile = file("/home/pedja/mwp_keystore.jks")
+            storePassword = System.getenv("MWP_KEYSTORE_PWD")
+            keyAlias = System.getenv("MWP_KEYSTORE_ALIAS")
+            keyPassword = System.getenv("MWP_KEYSTORE_ALIAS_PWD")
+        }
+    }
+
+
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
 
@@ -47,9 +60,9 @@ dependencies {
     compile 'com.android.support:appcompat-v7:24.0.0'
     compile "com.android.support:design:24.0.0"
     compile "com.android.support:recyclerview-v7:24.0.0"
-    compile "com.androidforever:data-loader-android:2.0.0"
+    compile "com.androidforever:data-loader-android:2.0.1"
     compile "com.tehnicomsolutions:ts-http-android:2.0.1"
-    compile "com.af.jutils:android:2.0.1"
+    compile "com.af.jutils:android:2.0.2"
     compile 'org.greenrobot:greendao:2.2.0'
     compile("com.crashlytics.sdk.android:crashlytics:2.5.5@aar") {
         transitive = true;
@@ -57,4 +70,5 @@ dependencies {
     compile 'org.greenrobot:eventbus:3.0.0'
     compile project(':volleyplus')
     compile project (":core")
+    compile 'com.github.chrisbanes:PhotoView:1.2.6'
 }

@@ -7,7 +7,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;
@@ -250,7 +249,7 @@ public class DatabaseManager
         try
         {
             int offset = (page - 1) * perPage;
-            PreparedStatement selectStatement = conn.prepareStatement("SELECT " + (withPoster ? "sp.show_id, sp.filename, sp.type, " : "") + " s.id, s.title, s.imdb_id, s.year" + (getOverview ? ", s.overview" : "") + " FROM shows s INNER JOIN show_photo sp ON s.id = sp.show_id WHERE s.title IS NOT NUll AND s.title != 'null' && s.title != '' ORDER BY s.year DESC LIMIT ?, ?");
+            PreparedStatement selectStatement = conn.prepareStatement("SELECT " + (withPoster ? "sp.show_id, sp.filename, sp.type, " : "") + " s.id, s.title, s.imdb_id, s.year" + (getOverview ? ", s.overview" : "") + " FROM shows s INNER JOIN show_photo sp ON s.id = sp.show_id WHERE s.title IS NOT NUll AND s.title != 'null' && s.title != '' GROUP BY sp.show_id ORDER BY s.year DESC LIMIT ?, ?");
             selectStatement.setInt(1, offset);
             selectStatement.setInt(2, perPage + 1);
 
@@ -299,7 +298,7 @@ public class DatabaseManager
             }
             else
             {
-                selectStatement = conn.prepareStatement("SELECT * FROM shows LEFT JOIN show_photo ON shows.id = show_photo.show_id AND show_photo.type = 'poster' WHERE shows.id = ? LIMIT 1");
+                selectStatement = conn.prepareStatement("SELECT * FROM shows LEFT JOIN show_photo ON shows.id = show_photo.show_id AND show_photo.type = 'fanart' WHERE shows.id = ? LIMIT 1");
             }
             selectStatement.setInt(1, showId);
 
@@ -472,6 +471,37 @@ public class DatabaseManager
         }
     }
 
+    public List<ShowPhoto> getShowPhotos(int showId)
+    {
+        List<ShowPhoto> shows = new ArrayList<>();
+        try
+        {
+            PreparedStatement selectStatement = conn.prepareStatement("SELECT show_id, filename FROM show_photo WHERE show_id = ? AND type = ? ORDER BY modified DESC");
+            selectStatement.setInt(1, showId);
+            selectStatement.setString(2, "fanart");
+
+            ResultSet resultSet = selectStatement.executeQuery();
+
+            while (resultSet.next())
+            {
+                ShowPhoto showPhoto = new ShowPhoto();
+                showPhoto.showId = resultSet.getInt("show_id");
+                showPhoto.filename = resultSet.getString("filename");
+                shows.add(showPhoto);
+            }
+
+            return shows;
+        }
+        catch (SQLException e)
+        {
+            //fail silently
+            if (debug)
+                e.printStackTrace();
+            LOGGER.warning(e.getMessage());
+            return shows;
+        }
+    }
+
     public List<Show> getPopularShows(boolean getOverview, boolean withPoster)
     {
         List<Show> shows = new ArrayList<>(100);
@@ -581,18 +611,15 @@ public class DatabaseManager
             PreparedStatement selectStatement;
             if (!withShow)
             {
-                selectStatement = conn.prepareStatement("SELECT sp.show_id, sp.filename, ps.ord FROM show_photo sp INNER JOIN popular_shows ps ON sp.show_id = ps.show_id WHERE sp.type = ? ORDER BY sp.show_id ASC");
+                selectStatement = conn.prepareStatement("SELECT sp.show_id, sp.filename, ps.ord FROM show_photo sp INNER JOIN popular_shows ps ON sp.show_id = ps.show_id WHERE sp.type = ? GROUP BY s.id ORDER BY ps.ord, sp.show_id, sp.filename ASC");
             }
             else
             {
-                selectStatement = conn.prepareStatement("SELECT s.id, s.title, s.year, sp.show_id, sp.filename, ps.ord FROM show_photo sp INNER JOIN popular_shows ps ON sp.show_id = ps.show_id LEFT JOIN shows s ON s.id = ps.show_id WHERE sp.type = ? ORDER BY sp.show_id ASC");
+                selectStatement = conn.prepareStatement("SELECT s.id, s.title, s.year, sp.show_id, sp.filename, ps.ord FROM show_photo sp INNER JOIN popular_shows ps ON sp.show_id = ps.show_id LEFT JOIN shows s ON s.id = ps.show_id WHERE sp.type = ? GROUP BY s.id ORDER BY ps.ord, sp.show_id, sp.filename ASC");
             }
             selectStatement.setString(1, "fanart");
 
             ResultSet resultSet = selectStatement.executeQuery();
-
-            List<ShowPhoto> tempList = new ArrayList<>();
-            int lastShowId = -1;
 
             while (resultSet.next())
             {
@@ -611,21 +638,8 @@ public class DatabaseManager
                     showPhoto.show = show;
                 }
 
-                if(lastShowId != showPhoto.showId)
-                {
-                    if(!tempList.isEmpty())
-                    {
-                        //choose one from list and add it to photos
-                        int rand = randInt(0, tempList.size() - 1);//randInt is inclusive (min max)
-                        photos.add(tempList.get(rand));
-                    }
-                    tempList.clear();
-                }
-                lastShowId = showPhoto.showId;
-                tempList.add(showPhoto);
+                photos.add(showPhoto);
             }
-
-            Collections.sort(photos);
 
             return photos;
         }

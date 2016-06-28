@@ -1,5 +1,7 @@
 package rs.pedjaapps.moviewallpapers.model;
 
+import java.io.Serializable;
+
 /**
  * Copyright (c) 2016 "Predrag Čokulov,"
  * pedjaapps [https://pedjaapps.net]
@@ -19,12 +21,27 @@ package rs.pedjaapps.moviewallpapers.model;
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-public class ShowPhoto implements TypeListItem.IListItem, Comparable<ShowPhoto>
+public class ShowPhoto implements TypeListItem.IListItem, Comparable<ShowPhoto>, Serializable
 {
     public static final int VIEW_TYPE_PHOTO = 1;
+    public static final int VIEW_TYPE_OVERVIEW = 2;
     public int showId;
     public String filename, type;
-    public Show show;
+    public transient Show show;
+    public transient boolean downloading;
+    public boolean fullPath;
+
+    private final int viewType;
+
+    public ShowPhoto(int viewType)
+    {
+        this.viewType = viewType;
+    }
+
+    public ShowPhoto()
+    {
+        viewType = VIEW_TYPE_PHOTO;
+    }
 
     //private
     public int ord;
@@ -37,7 +54,7 @@ public class ShowPhoto implements TypeListItem.IListItem, Comparable<ShowPhoto>
     @Override
     public int getViewType()
     {
-        return VIEW_TYPE_PHOTO;
+        return viewType;
     }
 
     @Override

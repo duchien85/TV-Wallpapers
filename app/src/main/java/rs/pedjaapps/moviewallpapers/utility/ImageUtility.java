@@ -26,10 +26,18 @@ import rs.pedjaapps.moviewallpapers.model.ShowPhoto;
 public class ImageUtility
 {
     @SuppressLint("DefaultLocale")
-    public static String generateImageUrl(ShowPhoto photo)
+    public static String generateImageUrlThumb(ShowPhoto photo)
     {
         if(photo == null)
             return null;
         return String.format("http://pedjaapps.net/mwp_static/images/%d/fanart/thumb_%s", photo.showId, photo.filename);
+    }
+
+    @SuppressLint("DefaultLocale")
+    public static String generateImageUrlFull(ShowPhoto photo)
+    {
+        if(photo == null)
+            return null;
+        return String.format("http://pedjaapps.net/mwp_static/images/%d/fanart/%s", photo.showId, photo.filename);
     }
 }

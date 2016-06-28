@@ -12,17 +12,18 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.af.jutils.RVArrayAdapter;
 import com.androidforever.dataloader.DataProvider;
 import com.tehnicomsolutions.http.Request;
 
 import java.util.List;
 
 import rs.pedjaapps.moviewallpapers.R;
+import rs.pedjaapps.moviewallpapers.ShowActivity;
 import rs.pedjaapps.moviewallpapers.adapter.GridAdapter;
 import rs.pedjaapps.moviewallpapers.model.Page;
 import rs.pedjaapps.moviewallpapers.model.ShowPhoto;
 import rs.pedjaapps.moviewallpapers.model.TypeListItem;
-import rs.pedjaapps.moviewallpapers.network.NetworkDataProvider;
 import rs.pedjaapps.moviewallpapers.network.PagedLoader;
 
 /**
@@ -44,7 +45,7 @@ import rs.pedjaapps.moviewallpapers.network.PagedLoader;
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-public abstract class PhotoGridFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, PagedLoader.LoadListener<ShowPhoto>,GridAdapter.LoadMorePhotos
+public abstract class PhotoGridFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, PagedLoader.LoadListener<ShowPhoto>,GridAdapter.LoadMorePhotos, RVArrayAdapter.OnItemClickListener
 {
     private GridAdapter mAdapter;
     private ProgressBar pbLoading;
@@ -102,18 +103,24 @@ public abstract class PhotoGridFragment extends Fragment implements SwipeRefresh
 
         Request request = getRequest();
 
-        pagedLoader = new PagedLoader<>(NetworkDataProvider.REQUEST_CODE_SHOWS_PHOTOS, request, null);
+        pagedLoader = new PagedLoader<>(getRequestCode(), request, null);
         pagedLoader.setLoadListener(this);
+        List<DataProvider<Page<ShowPhoto>>> addProviders = getAdditionalProviders();
+        if(addProviders != null)pagedLoader.setAdditionalProviders(addProviders, PagedLoader.PROVIDERS_ADD_BEFORE);
 
-        mAdapter = new GridAdapter(getActivity(), pagedLoader.getItems(), this);
+        mAdapter = new GridAdapter(getActivity(), pagedLoader.getItems(), this, getString(R.string.transition_image_1), true, false);
         recyclerView.setAdapter(mAdapter);
+
+        mAdapter.setOnItemClickListener(this);
 
         onRefresh();
 
         return view;
     }
 
+    protected abstract List<DataProvider<Page<ShowPhoto>>> getAdditionalProviders();
     protected abstract Request getRequest();
+    protected abstract int getRequestCode();
 
     @Override
     public void loadMore()
@@ -145,7 +152,6 @@ public abstract class PhotoGridFragment extends Fragment implements SwipeRefresh
         firstVisibleItem = 0;
         visibleItemCount = 0;
         totalItemCount = 0;
-        pagedLoader.setAdditionalProviders(null, 0);
         pagedLoader.reset();
         loading = true;
     }
@@ -168,5 +174,11 @@ public abstract class PhotoGridFragment extends Fragment implements SwipeRefresh
             loadMore();
             wantToLoadMore = false;
         }
+    }
+
+    @Override
+    public void onItemClick(View view, Object o, int i)
+    {
+        ShowActivity.start(getActivity(), ((ShowPhoto)o).showId, view);
     }
 }
