@@ -6,7 +6,7 @@ import android.os.Environment;
 
 import com.android.volley.VolleyLog;
 import com.android.volley.cache.DiskLruBasedCache;
-import com.android.volley.cache.plus.SimpleImageLoader;
+import com.android.volley.cache.SimpleImageLoader;
 import com.androidforever.dataloader.MemCache;
 import com.crashlytics.android.Crashlytics;
 import com.tehnicomsolutions.http.AndroidInternet;

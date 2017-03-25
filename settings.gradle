@@ -1,5 +1,4 @@
-include ':app', ':volleyplus', 'dao-generator'
-project(':volleyplus').projectDir = new File('./volleyplus/library')
+include ':app', 'dao-generator'
 include 'rest_api'
 include 'core'
 include 'crawler'

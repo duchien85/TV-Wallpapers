@@ -30,7 +30,7 @@ public class ImageUtility
     {
         if(photo == null)
             return null;
-        return String.format("http://pedjaapps.net/mwp_static/images/%d/fanart/thumb_%s", photo.showId, photo.filename);
+        return String.format("http://-pedjaapps.net/mwp_static/images/%d/fanart/thumb_%s", photo.showId, photo.filename);
     }
 
     @SuppressLint("DefaultLocale")
@@ -38,6 +38,6 @@ public class ImageUtility
     {
         if(photo == null)
             return null;
-        return String.format("http://pedjaapps.net/mwp_static/images/%d/fanart/%s", photo.showId, photo.filename);
+        return String.format("http://-pedjaapps.net/mwp_static/images/%d/fanart/%s", photo.showId, photo.filename);
     }
 }

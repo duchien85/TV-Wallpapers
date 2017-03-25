@@ -12,8 +12,8 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
-import com.android.volley.cache.plus.ImageLoader;
 import com.android.volley.error.VolleyError;
+import com.android.volley.toolbox.ImageLoader;
 
 import rs.pedjaapps.moviewallpapers.model.ShowPhoto;
 import rs.pedjaapps.moviewallpapers.utility.ImageUtility;
