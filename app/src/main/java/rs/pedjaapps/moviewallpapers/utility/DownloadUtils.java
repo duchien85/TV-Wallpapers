@@ -4,7 +4,7 @@ import android.app.DownloadManager;
 import android.content.Context;
 import android.net.Uri;
 
-import com.af.jutils.Alert;
+import org.skynetsoftware.jutils.Alert;
 
 import java.io.File;
 import java.util.ArrayList;

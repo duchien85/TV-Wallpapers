@@ -3,7 +3,8 @@ package rs.pedjaapps.moviewallpapers.network;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.androidforever.dataloader.DataProvider;
+import org.skynetsoftware.dataloader.DataProvider;
+
 
 /**
  * Created by pedja on 23.9.15. 13.28.
@@ -65,6 +66,12 @@ public class DatabaseDataProvider<T> implements DataProvider<T>
     public boolean forceLoading()
     {
         return false;
+    }
+
+    @Override
+    public Object getMetadata()
+    {
+        return null;
     }
 
     public static class Query implements Parcelable

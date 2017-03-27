@@ -1,6 +1,6 @@
 package rs.pedjaapps.moviewallpapers.network;
 
-import com.androidforever.dataloader.DataProvider;
+import org.skynetsoftware.dataloader.DataProvider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,5 +62,11 @@ public class ListFilesDataProvider implements DataProvider<Page<ShowPhoto>>
     public boolean forceLoading()
     {
         return false;
+    }
+
+    @Override
+    public Object getMetadata()
+    {
+        return null;
     }
 }

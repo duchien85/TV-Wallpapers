@@ -4,7 +4,7 @@ buildscript {
         maven { url 'https://maven.fabric.io/public' }
     }
     dependencies {
-        classpath 'io.fabric.tools:gradle:1.21.2'
+        classpath 'io.fabric.tools:gradle:1.21.6'
     }
 }
 
@@ -60,15 +60,17 @@ dependencies {
     compile 'com.android.support:appcompat-v7:25.3.0'
     compile "com.android.support:design:25.3.0"
     compile "com.android.support:recyclerview-v7:25.3.0"
-    compile "com.androidforever:data-loader-android:2.0.1"
-    compile "com.tehnicomsolutions:ts-http-android:2.0.1"
-    compile "org.skynetsoftware:volleyplus:1.0.2"
-    compile "com.af.jutils:android:2.0.2"
+    compile "org.skynetsoftware:data-loader-android:3.0.0"
+    compile "org.skynetsoftware:snet-android:3.1.4"
+    compile "org.skynetsoftware:jutils-android:3.0.0"
     compile 'org.greenrobot:greendao:2.2.0'
-    compile("com.crashlytics.sdk.android:crashlytics:2.5.5@aar") {
+    compile("com.crashlytics.sdk.android:crashlytics:2.6.7@aar") {
         transitive = true;
     }
     compile 'org.greenrobot:eventbus:3.0.0'
     compile project (":core")
     compile 'com.github.chrisbanes:PhotoView:1.2.6'
+    compile 'com.github.bumptech.glide:glide:3.7.0'
+    compile 'jp.wasabeef:glide-transformations:2.0.2'
+
 }

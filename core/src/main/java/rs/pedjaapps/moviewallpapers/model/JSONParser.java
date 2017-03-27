@@ -1,11 +1,10 @@
 package rs.pedjaapps.moviewallpapers.model;
 
 
-import com.tehnicomsolutions.http.Internet;
-import com.tehnicomsolutions.http.ResponseParser;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.skynetsoftware.snet.Internet;
+import org.skynetsoftware.snet.ResponseParser;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

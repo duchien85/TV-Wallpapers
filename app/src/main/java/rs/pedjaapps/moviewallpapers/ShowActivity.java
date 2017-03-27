@@ -15,12 +15,15 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
-import com.af.jutils.RVArrayAdapter;
-import com.androidforever.dataloader.AndroidDataLoader;
-import com.androidforever.dataloader.DataLoader;
-import com.androidforever.dataloader.DataProvider;
-import com.androidforever.dataloader.MemoryCacheDataProvider;
-import com.tehnicomsolutions.http.Request;
+import com.bumptech.glide.Glide;
+
+import org.skynetsoftware.dataloader.AndroidDataLoader;
+import org.skynetsoftware.dataloader.CacheDataProvider;
+import org.skynetsoftware.dataloader.DataLoader;
+import org.skynetsoftware.dataloader.DataProvider;
+import org.skynetsoftware.dataloader.MemCache;
+import org.skynetsoftware.jutils.RVArrayAdapter;
+import org.skynetsoftware.snet.Request;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -106,7 +109,7 @@ public class ShowActivity extends AppCompatActivity implements DataLoader.LoadLi
         request.addParam("with_photos", true);
 
         NetworkDataProvider<Show> networkDataProvider = new NetworkDataProvider<>(request, NetworkDataProvider.REQUEST_CODE_SHOW);
-        MemoryCacheDataProvider<Show> memoryCacheDataProvider = new MemoryCacheDataProvider<>(request.getRequestUrl());
+        CacheDataProvider<MemCache, Show> memoryCacheDataProvider = new CacheDataProvider<>(request.getRequestUrl(), MemCache.class);
 
         dataProviders.add(memoryCacheDataProvider);
         dataProviders.add(networkDataProvider);
@@ -135,8 +138,8 @@ public class ShowActivity extends AppCompatActivity implements DataLoader.LoadLi
             mCollapsingToolbarLayout.setTitle(String.format("%s (%d)", mShow.title, mShow.year));
             mAdapter.addAll(result.data.photos, true);
 
-            App.get().getGlobalImageLoader().get(ImageUtility.generateImageUrlThumb(mShow.showPhoto), ivHeader);
-            App.get().getGlobalImageLoader().get(ImageUtility.generateImageUrlFull(mShow.showPhoto), ivHeader);
+            Glide.with(this).load(ImageUtility.generateImageUrlThumb(mShow.showPhoto)).dontAnimate().into(ivHeader);
+            Glide.with(this).load(ImageUtility.generateImageUrlFull(mShow.showPhoto)).dontAnimate().into(ivHeader);
         }
     }
 

@@ -12,9 +12,11 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.af.jutils.Android;
-import com.af.jutils.DisplayUtils;
-import com.af.jutils.RVArrayAdapter;
+import com.bumptech.glide.Glide;
+
+import org.skynetsoftware.jutils.Android;
+import org.skynetsoftware.jutils.DisplayUtils;
+import org.skynetsoftware.jutils.RVArrayAdapter;
 
 import java.util.List;
 
@@ -119,11 +121,11 @@ public class GridAdapter extends RVArrayAdapter<TypeListItem<ShowPhoto>>
             }
             if(photo.fullPath)
             {
-                App.get().getGlobalImageLoader().get(photo.filename, holder.ivImage);
+                Glide.with(context).load(photo.filename).dontAnimate().into(holder.ivImage);
             }
             else
             {
-                App.get().getGlobalImageLoader().get(ImageUtility.generateImageUrlThumb(photo), holder.ivImage);
+                Glide.with(context).load(ImageUtility.generateImageUrlThumb(photo)).dontAnimate().into(holder.ivImage);
             }
             setAnimation(holder.itemView, position);
 

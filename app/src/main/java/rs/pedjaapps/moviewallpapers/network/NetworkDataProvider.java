@@ -4,10 +4,10 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
-import com.androidforever.dataloader.DataProvider;
-import com.tehnicomsolutions.http.Http;
-import com.tehnicomsolutions.http.Request;
-import com.tehnicomsolutions.http.ResponseParser;
+import org.skynetsoftware.dataloader.DataProvider;
+import org.skynetsoftware.snet.Request;
+import org.skynetsoftware.snet.ResponseParser;
+import org.skynetsoftware.snet.SNet;
 
 import rs.pedjaapps.moviewallpapers.BuildConfig;
 import rs.pedjaapps.moviewallpapers.model.JSONParser;
@@ -50,7 +50,7 @@ public class NetworkDataProvider<T> implements DataProvider<T>
     @Override
     public boolean load()
     {
-        if (!Http.getInstance().network.isNetworkAvailable())
+        if (!SNet.getInstance().getNetwork().isNetworkAvailable())
         {
             return false;
         }
@@ -58,7 +58,7 @@ public class NetworkDataProvider<T> implements DataProvider<T>
         {
             if (BuildConfig.DEBUG)
                 Log.d("network-data-provider", String.format("NetworkDataProvider::load()[requestCode=%s]", requestCode));
-            final JSONParser jsonParser = new JSONParser(Http.getInstance().internet.executeHttpRequest(request));
+            final JSONParser jsonParser = new JSONParser(SNet.getInstance().getInternet().executeHttpRequest(request));
             switch (requestCode)
             {
                 case REQUEST_CODE_SHOWS_PHOTOS:
@@ -91,11 +91,11 @@ public class NetworkDataProvider<T> implements DataProvider<T>
                 {
                     if (jsonParser.getResponseMessage() != null)
                     {
-                        Http.getInstance().ui.showToast(jsonParser.getResponseMessage());
+                        SNet.getInstance().getUi().showToast(jsonParser.getResponseMessage());
                     }
                     else if (!jsonParser.getServerResponse().isResponseOk())
                     {
-                        Http.getInstance().ui.showToast(Http.getInstance().textManager.getText("unknown_error"));
+                        SNet.getInstance().getUi().showToast(SNet.getInstance().getTextManager().getText("unknown_error"));
                     }
                 }
             });
@@ -113,5 +113,11 @@ public class NetworkDataProvider<T> implements DataProvider<T>
     public boolean forceLoading()
     {
         return forceLoading;
+    }
+
+    @Override
+    public Object getMetadata()
+    {
+        return null;
     }
 }

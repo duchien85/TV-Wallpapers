@@ -1,7 +1,8 @@
 package rs.pedjaapps.moviewallpapers.fragment;
 
-import com.androidforever.dataloader.DataProvider;
-import com.tehnicomsolutions.http.Request;
+
+import org.skynetsoftware.dataloader.DataProvider;
+import org.skynetsoftware.snet.Request;
 
 import java.util.List;
 

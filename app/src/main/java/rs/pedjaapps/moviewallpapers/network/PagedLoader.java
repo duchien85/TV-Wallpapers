@@ -1,12 +1,13 @@
 package rs.pedjaapps.moviewallpapers.network;
 
-import com.androidforever.dataloader.AndroidDataLoader;
-import com.androidforever.dataloader.DataLoader;
-import com.androidforever.dataloader.DataProvider;
-import com.androidforever.dataloader.MemCache;
-import com.androidforever.dataloader.MemoryCacheDataProvider;
-import com.androidforever.dataloader.SimpleLoadListener;
-import com.tehnicomsolutions.http.Request;
+
+import org.skynetsoftware.dataloader.AndroidDataLoader;
+import org.skynetsoftware.dataloader.CacheDataProvider;
+import org.skynetsoftware.dataloader.DataLoader;
+import org.skynetsoftware.dataloader.DataProvider;
+import org.skynetsoftware.dataloader.MemCache;
+import org.skynetsoftware.dataloader.SimpleLoadListener;
+import org.skynetsoftware.snet.Request;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +47,7 @@ public class PagedLoader<T extends TypeListItem.IListItem>
     private DataLoader<Page<T>> dataLoader;
     private Request request;
     private DatabaseDataProvider<Page<T>> databaseDataProvider;
-    private MemoryCacheDataProvider<Page<T>> memoryCacheDataProvider;
+    private CacheDataProvider<MemCache, Page<T>> memoryCacheDataProvider;
     private List<DataProvider<Page<T>>> additionalProviders;
     private int additionalProvidersAdd = PROVIDERS_ADD_AFTER;
 
@@ -73,7 +74,7 @@ public class PagedLoader<T extends TypeListItem.IListItem>
         items = new ArrayList<>();
 
         databaseDataProvider = new DatabaseDataProvider<>(requestCode, query);
-        if(request != null && memcache)memoryCacheDataProvider = new MemoryCacheDataProvider<>(request.getRequestUrl());
+        if(request != null && memcache)memoryCacheDataProvider = new CacheDataProvider<>(request.getRequestUrl(), MemCache.class);
 
         dataLoader = new AndroidDataLoader<>();
         dataLoader.setListener(new SimpleLoadListener<Page<T>>()
@@ -89,7 +90,7 @@ public class PagedLoader<T extends TypeListItem.IListItem>
             {
                 if (result.status == DataLoader.Result.STATUS_OK && result.data != null)
                 {
-                    boolean isMem = (result.provider instanceof MemoryCacheDataProvider);
+                    boolean isMem = (result.provider instanceof CacheDataProvider);
                     Page<T> pge = result.data;
                     int oldPage = page;
                     if (!isMem)//only if response is no from memcache set page,count,next
@@ -105,7 +106,7 @@ public class PagedLoader<T extends TypeListItem.IListItem>
                         items.remove(items.size() - 1);
                     }
                     //if we just got same page like previous page, just return
-                    if(oldPage == page && !(result.provider instanceof MemoryCacheDataProvider))
+                    if(oldPage == page && !(result.provider instanceof CacheDataProvider))
                     {
                         if (loadListener != null) loadListener.onLoaded(true, null, result.provider);
                         return;
@@ -120,7 +121,7 @@ public class PagedLoader<T extends TypeListItem.IListItem>
                     ///if we got result from network, and its page 1, add it to memcache
                     if(pge.page == 1 && result.provider instanceof NetworkDataProvider)
                     {
-                        MemCache.getInstance().addToCache(request.getRequestUrl(), pge);
+                        MemCache.getInstance(MemCache.class).addToCache(request.getRequestUrl(), pge);
                         items.clear();
                     }
                     list.removeAll(items);

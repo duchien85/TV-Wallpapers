@@ -23,6 +23,9 @@
         <activity android:name=".ShowActivity"/>
         <activity android:name=".PhotoViewActivity"
             android:theme="@style/AppTheme.Transparent"/>
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="dfda65c0dfc9a63025b8d6e98dc98ce082190d2b" />
     </application>
 
 </manifest>

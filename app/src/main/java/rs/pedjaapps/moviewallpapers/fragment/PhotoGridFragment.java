@@ -12,9 +12,9 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.af.jutils.RVArrayAdapter;
-import com.androidforever.dataloader.DataProvider;
-import com.tehnicomsolutions.http.Request;
+import org.skynetsoftware.dataloader.DataProvider;
+import org.skynetsoftware.jutils.RVArrayAdapter;
+import org.skynetsoftware.snet.Request;
 
 import java.util.List;
 

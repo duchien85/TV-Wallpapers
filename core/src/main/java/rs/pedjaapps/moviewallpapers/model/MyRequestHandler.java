@@ -1,9 +1,10 @@
 package rs.pedjaapps.moviewallpapers.model;
 
-import com.tehnicomsolutions.http.Http;
-import com.tehnicomsolutions.http.Request;
-import com.tehnicomsolutions.http.RequestHandler;
-import com.tehnicomsolutions.http.ResponseParser;
+
+import org.skynetsoftware.snet.Request;
+import org.skynetsoftware.snet.RequestHandler;
+import org.skynetsoftware.snet.ResponseParser;
+import org.skynetsoftware.snet.SNet;
 
 /**
  * Copyright (c) 2016 "Predrag Čokulov,"
@@ -34,7 +35,7 @@ public class MyRequestHandler implements RequestHandler
 
     public ResponseParser handleRequest(int requestCode, Request builder, boolean sync)
     {
-        JSONParser parser = new JSONParser(Http.getInstance().internet.executeHttpRequest(builder));
+        JSONParser parser = new JSONParser(SNet.getInstance().getInternet().executeHttpRequest(builder));
         switch (requestCode)
         {
             case REQUEST_CODE_LOGIN:

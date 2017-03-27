@@ -1,26 +1,25 @@
 package rs.pedjaapps.moviewallpapers;
 
-import android.app.Activity;
 import android.app.Application;
 import android.os.Environment;
 
-import com.android.volley.VolleyLog;
-import com.android.volley.cache.DiskLruBasedCache;
-import com.android.volley.cache.SimpleImageLoader;
-import com.androidforever.dataloader.MemCache;
+import com.bumptech.glide.Glide;
 import com.crashlytics.android.Crashlytics;
-import com.tehnicomsolutions.http.AndroidInternet;
-import com.tehnicomsolutions.http.AndroidNetwork;
-import com.tehnicomsolutions.http.AndroidRequestManager;
-import com.tehnicomsolutions.http.AndroidTextManager;
-import com.tehnicomsolutions.http.AndroidUI;
-import com.tehnicomsolutions.http.Http;
-import com.tehnicomsolutions.http.Internet;
-import com.tehnicomsolutions.http.Network;
-import com.tehnicomsolutions.http.Request;
-import com.tehnicomsolutions.http.RequestManager;
-import com.tehnicomsolutions.http.TextManager;
-import com.tehnicomsolutions.http.UI;
+
+import org.skynetsoftware.dataloader.Cache;
+import org.skynetsoftware.dataloader.MemCache;
+import org.skynetsoftware.snet.AndroidInternet;
+import org.skynetsoftware.snet.AndroidNetwork;
+import org.skynetsoftware.snet.AndroidRequestManager;
+import org.skynetsoftware.snet.AndroidTextManager;
+import org.skynetsoftware.snet.AndroidUI;
+import org.skynetsoftware.snet.Internet;
+import org.skynetsoftware.snet.Network;
+import org.skynetsoftware.snet.Request;
+import org.skynetsoftware.snet.RequestManager;
+import org.skynetsoftware.snet.SNet;
+import org.skynetsoftware.snet.TextManager;
+import org.skynetsoftware.snet.UI;
 
 import java.io.File;
 
@@ -42,10 +41,6 @@ import rs.pedjaapps.moviewallpapers.utility.SettingsManager;
 public class App extends Application
 {
     private static App app = null;
-
-    private SimpleImageLoader mGlobalImageLoader;
-    private DiskLruBasedCache.ImageCacheParams cacheParams;
-    private Activity mCurrentActivity = null;
 
     public File DOWNLOAD_DIR;
 
@@ -73,14 +68,12 @@ public class App extends Application
         UI ui = new AndroidUI(this);
         TextManager textManager = new AndroidTextManager(this);
 
-        Http.initialize(network, internet, ui, textManager);
+        SNet.initialize(network, internet, ui, textManager);
 
         Request.setDefaultRequestUrl(API.REQUEST_URL);
         RequestManager.initialize(new AndroidRequestManager());
         RequestManager.getInstance().setGlobalRequestHandler(new MRequestHandler());
-        Http.LOGGING = SettingsManager.DEBUG();
-
-        initImageLoader();
+        SNet.LOGGING = SettingsManager.DEBUG();
 
         initDownloadDir();
     }
@@ -97,44 +90,11 @@ public class App extends Application
             throw new IllegalStateException("Failed to create download dir on sdcard");
     }
 
-    /**Init image loader cache*/
-    public void initImageLoader()
-    {
-        cacheParams = new DiskLruBasedCache.ImageCacheParams(this, ".cache");
-        cacheParams.setMemCacheSizePercent(0.1f);
-        cacheParams.diskCacheSize = 1024 * 1024 * 200;//200MB, is it ot much?
-        cacheParams.diskCacheEnabled = true;
-        cacheParams.memoryCacheEnabled = false;//this does nothing o:O
-        VolleyLog.DEBUG = SettingsManager.DEBUG();
-
-        mGlobalImageLoader = new SimpleImageLoader(this, cacheParams);
-    }
-
-    public Activity getCurrentActivity()
-    {
-        return mCurrentActivity;
-    }
-
-    public void setCurrentActivity(Activity currentActivity)
-    {
-        this.mCurrentActivity = currentActivity;
-    }
-
     @Override
     public void onLowMemory()
     {
         super.onLowMemory();
-        MemCache.getInstance().flushCache();
-        mGlobalImageLoader.flushCache();
-    }
-
-    public DiskLruBasedCache.ImageCacheParams getCacheParams()
-    {
-        return cacheParams;
-    }
-
-    public SimpleImageLoader getGlobalImageLoader()
-    {
-        return mGlobalImageLoader;
+        Cache.getInstance(MemCache.class).flushCache();
+        Glide.get(this).clearMemory();
     }
 }

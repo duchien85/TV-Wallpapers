@@ -12,8 +12,10 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
-import com.android.volley.error.VolleyError;
-import com.android.volley.toolbox.ImageLoader;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 
 import rs.pedjaapps.moviewallpapers.model.ShowPhoto;
 import rs.pedjaapps.moviewallpapers.utility.ImageUtility;
@@ -64,30 +66,28 @@ public class PhotoViewActivity extends AppCompatActivity
             {
                 ivImageTrans.setVisibility(View.GONE);
                 pbLoading.setVisibility(View.GONE);
-                App.get().getGlobalImageLoader().get(showPhoto.filename, ivImage);
+                Glide.with(this).load(showPhoto.filename).dontAnimate().into(ivImage);
             }
             else
             {
-                App.get().getGlobalImageLoader().get(ImageUtility.generateImageUrlThumb(showPhoto), ivImageTrans);
-                App.get().getGlobalImageLoader().get(ImageUtility.generateImageUrlFull(showPhoto), new ImageLoader.ImageListener()
+                Glide.with(this).load(ImageUtility.generateImageUrlThumb(showPhoto)).dontAnimate().into(ivImageTrans);
+                Glide.with(this).load(ImageUtility.generateImageUrlThumb(showPhoto)).dontAnimate().listener(new RequestListener<String, GlideDrawable>()
                 {
                     @Override
-                    public void onResponse(ImageLoader.ImageContainer response, boolean isImmediate, boolean isFinished)
+                    public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource)
                     {
-                        if(isFinished)
-                        {
-                            ivImageTrans.setVisibility(View.GONE);
-                            ivImage.setImageDrawable(response.getBitmap());
-                            pbLoading.setVisibility(View.GONE);
-                        }
+                        pbLoading.setVisibility(View.GONE);
+                        return false;
                     }
 
                     @Override
-                    public void onErrorResponse(VolleyError error)
+                    public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource)
                     {
+                        ivImageTrans.setVisibility(View.GONE);
                         pbLoading.setVisibility(View.GONE);
+                        return false;
                     }
-                });
+                }).into(ivImageTrans);
             }
         }
     }
