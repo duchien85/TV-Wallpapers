@@ -21,7 +21,7 @@ apply plugin: 'io.fabric'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    buildToolsVersion "25.0.3"
 
     defaultConfig {
         applicationId "rs.pedjaapps.moviewallpapers"
@@ -57,12 +57,12 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
-    compile 'com.android.support:appcompat-v7:25.3.0'
-    compile "com.android.support:design:25.3.0"
-    compile "com.android.support:recyclerview-v7:25.3.0"
+    compile 'com.android.support:appcompat-v7:25.3.1'
+    compile "com.android.support:design:25.3.1"
+    compile "com.android.support:recyclerview-v7:25.3.1"
     compile "org.skynetsoftware:data-loader-android:3.0.0"
-    compile "org.skynetsoftware:snet-android:3.1.4"
-    compile "org.skynetsoftware:jutils-android:3.0.0"
+    compile "org.skynetsoftware:snet-android:4.0.2"
+    compile "org.skynetsoftware:jutils-android:3.0.2"
     compile 'org.greenrobot:greendao:2.2.0'
     compile("com.crashlytics.sdk.android:crashlytics:2.6.7@aar") {
         transitive = true;
